@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const program = require('commander');
 const transferUtil = require('./transfer');
+const callContractUtil = require('./callContract');
 const decodeUtil = require('./decodeTxRaw');
 const txUtil = require('./getTransaction');
 const inspect = require('./inspects');
@@ -22,6 +23,19 @@ program
     .option('--config <type>', 'config')
     .description('transfer token with PK')
     .action(transfer);
+
+program
+    .command('callContract')
+    .option('-f, --from <address>', 'from address')
+    .option('-m, --method <method>', 'contract method name')
+    .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
+    .option('--config <config>', 'config file path')
+    .description('call contract')
+    .action(callContract);
+
+function commaSeparatedList(value, dummyPrevious) {
+    return value.split(',');
+}
 
 program
     .command('transferWithPassword')
@@ -99,9 +113,9 @@ program
 
 program.parse(process.argv);
 
-function readConfig(configName = "config.js") {
+function readConfig(configName = "./config.js") {
     let config = {};
-    const filePath = path.normalize(path.resolve(__dirname, './') + '/' + configName);
+    const filePath = path.normalize(configName);
     console.log(`config path: ${filePath}`);
     if (fs.existsSync(filePath)) {
         config = require(filePath);
@@ -110,12 +124,12 @@ function readConfig(configName = "config.js") {
 }
 
 async function importKeyStore(cmdObj) {
-    let {file,config: configName} = cmdObj;
+    let {file, config: configName} = cmdObj;
     const config = readConfig(configName);
     const filePath = path.normalize(file);
     const Web3 = require("web3");
     const web3 = new Web3(config.url);
-    keystoreRead(web3,filePath);
+    keystoreRead(web3, filePath);
 }
 
 async function balanceOf(cmdObj) {
@@ -258,6 +272,49 @@ function decode(cmdObj) {
 
     decodeUtil(raw, abi);
 }
+
+//
+// .option('-m, --method <type>', 'contract method name')
+//     .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
+//     .option('--config <type>', 'config')
+
+async function callContract(cmdObj) {
+    let {method, parameters, config: configName, from: fromAddress, fromAddressPK, contractAddress, abi} = cmdObj;
+    const config = readConfig(configName);
+    if (!contractAddress) {
+        contractAddress = config.contractAddress;
+    }
+    if (!fromAddressPK) {
+        fromAddressPK = config.fromAddressPK;
+    }
+    if (!fromAddress) {
+        fromAddress = config.fromAddress;
+    }
+    if (!method) {
+        method = config.method;
+    }
+    if (!abi) {
+        abi = config.abi;
+    }
+
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+
+    console.log("\n--------------callContract--------------\n");
+
+    await callContractUtil.callContract({
+        web3,
+        contractAddress,
+        method,
+        fromAddress,
+        fromAddressPK,
+        abi,
+        parameters,
+        gasPrice: config.gasPrice,
+        gasLimit: config.gasLimit
+    });
+}
+
 
 async function transfer(cmdObj) {
     let {contract: contractAddress, from: fromAddress, pk: fromAddressPK, to: toAddress, abi, money, password, config: configName} = cmdObj;

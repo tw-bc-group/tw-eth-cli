@@ -1,5 +1,7 @@
 ## 使用方法
 
+[English](./README.en.md) / 中文
+
 使用方法
 1. 需要在config文件里面配置私钥
 ./cli/index.js transfer -t 0xcA843569e3427144cEad5e4d5999a3D0cCF92B8e -m 9.9 --config config.local.quorum.js 

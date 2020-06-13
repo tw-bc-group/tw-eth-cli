@@ -1,8 +1,11 @@
 {
-  "name": "eth-cli",
-  "version": "1.0.0",
+  "name": "tw-eth-cli",
+  "version": "1.0.1",
   "description": "a simple cli tool for eth like blockchain ",
   "main": "./src/index.js",
+  "bin": {
+    "tw-eth-cli": "./src/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +25,7 @@
   },
   "homepage": "https://github.com/tw-bc-group/eth-cli#readme",
   "dependencies": {
+    "abi-decoder": "^2.3.0",
     "commander": "^5.1.0",
     "web3": "^1.2.9"
   },
