@@ -7,7 +7,7 @@
 
 ### 1. 安转 tw-eth-cli
 
-npm install tw-eth-cli -g
+`npm install tw-eth-cli -g`
 
 ### 2. config 文件
 
@@ -26,79 +26,80 @@ npm install tw-eth-cli -g
 | money | 转账的金额，转 ETH，ERC20 会用到 |
 | abi | 和合约交互，解析交易会用到 |
  
- ### 3. 查看命令基本信息
+
+### 3. 查看命令基本信息
  
- tw-eth-cli
+ `tw-eth-cli`
  
  > 大部分命令的参数可以配置在 config 文件中，也可以指定在命令行中，命令行的优先级大于 config。
  
  ### 4. 帮助文档
  
- tw-eth-cli help <commmand> 
+ `tw-eth-cli help <commmand>`
  
 ### 5. 转账ERC20
 
-tw-eth-cli transferWithPassword -t <address> -m 9.9 
+`tw-eth-cli transferWithPassword -t <address> -m <money>` 
 
 >transferWithPassword 是使用 web3.eth.personal 中的 account
 
-tw-eth-cli transfer -t <address> -m 9.9 
+`tw-eth-cli transfer -t <address> -m <money>` 
 
 > 注意这里是转账 ERC20，如果想转 ETH，可以使用 MetaMask，或者使用 transferEth 命令
 
 ### 6. decode raw transaction
 
-tw-eth-cli decode --config <config.js>
+`tw-eth-cli decode --config <config.js>`
 
 在 config.js 里面配置 raw，如果想要解析 data 里面的数据，可以配置对应 abi。本命令可以用来调试各个客户端的签名数据。
 
 ### 7. get transaction by hash
 
-tw-eth-cli getTx --config <config.js>
+`tw-eth-cli getTx --config <config.js>`
 
 在 config.js 里面配置 hash，如果想要解析 data 里面的数据，可以配置对应 abi。
 
 ### 8. get block transactions
 
-tw-eth-cli getBlockTxs
+`tw-eth-cli getBlockTxs`
 
 默认同步100个块
 
 ### 9. txpool, 查看节点缓存情况
 
-tw-eth-cli pool -c status 
+`tw-eth-cli pool -c status` 
  
-tw-eth-cli pool -c content 
+`tw-eth-cli pool -c content` 
  
-tw-eth-cli pool -c inspect 
+`tw-eth-cli pool -c inspect` 
 
 可以用 -u 配置远程节点，不使用 config 里面的 url。
 
 ### 10. recoverTx，验证签名
 
-tw-eth-cli recoverTx 
+`tw-eth-cli recoverTx` 
 
 ### 11. balanceOf, 获取 eth 或者 erc20 余额
 
-tw-eth-cli balanceOf 
+`tw-eth-cli balanceOf` 
 
 ### 12. inspect, 生成公钥和地址
 
-tw-eth-cli inspect -k <privateKey> 
+`tw-eth-cli inspect -k <privateKey>`
 
 ### 13. 读取keystore
 
-tw-eth-cli keystore -f <key.json>
+`tw-eth-cli keystore -f <key.json>`
  
 ### 14. 转账 ETH
  
-tw-eth-cli transferEth -t <address> -m 88 
+`tw-eth-cli transferEth -t <address> -m <money>`
 
-tw-eth-cli transferEthWithPassword -f <address> -t <address> -m 8.8
+`tw-eth-cli transferEthWithPassword -f <address> -t <address> -m <money>`
 
 ### 15. Call Contract
 
-tw-eth-cli callContract -m <method name> -p <parameter1>,<parameter2> --config <config file path>
+`tw-eth-cli callContract -m <method name> -p <parameter1>,<parameter2> --config <config file path>`
 
 
 
