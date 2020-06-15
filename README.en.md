@@ -3,6 +3,8 @@
 English / [中文](./README.md)
 
 1. 需要在config文件里面配置私钥
+
+默认读取的config路径为`~/tw-eth-cli-config.js`
 tw-eth-cli transfer -t 0xcA843569e3427144cEad5e4d5999a3D0cCF92B8e -m 9.9 --config config.local.quorum.js 
 
 2. 只能在node节点有的账号转账，可以设置password

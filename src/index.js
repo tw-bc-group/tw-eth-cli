@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 const path = require('path');
+const untildify = require('untildify');
 const fs = require('fs');
 const program = require('commander');
 const transferUtil = require('./transfer');
+const transferEthUtil = require('./transferEth');
 const callContractUtil = require('./callContract');
 const decodeUtil = require('./decodeTxRaw');
 const txUtil = require('./getTransaction');
 const inspect = require('./inspects');
 const keystoreRead = require('./importKeystore');
+const version = require('../package.json').version
 
-
-program.version('eth cli 0.0.1');
+program.version(`eth cli ${version}`);
 
 program
     .command('transfer')
@@ -23,6 +25,16 @@ program
     .option('--config <type>', 'config')
     .description('transfer token with PK')
     .action(transfer);
+
+program
+    .command('transferEth')
+    .option('-f, --from <type>', 'from address')
+    .option('-p, --pk <type>', 'from address private key')
+    .option('-t, --to <type>', 'to address')
+    .option('-m, --money <type>', 'money')
+    .option('--config <type>', 'config')
+    .description('transfer eth')
+    .action(transferEth);
 
 program
     .command('callContract')
@@ -48,6 +60,18 @@ program
     .option('--config <type>', 'config')
     .description('transfer token by personal account')
     .action(transferWithPassword);
+
+
+program
+    .command('transferEthWithPassword')
+    .option('-f, --from <type>', 'from address')
+    .option('-t, --to <type>', 'to address')
+    .option('-m, --money <type>', 'money')
+    .option('-p, --password <type>', 'password')
+    .option('--config <type>', 'config')
+    .description('transfer eth by personal account')
+    .action(transferEthWithPassword);
+
 
 program
     .command('decode')
@@ -113,11 +137,12 @@ program
 
 program.parse(process.argv);
 
-function readConfig(configName = "./config.js") {
+function readConfig(configName = "~/tw-eth-cli-config.js") {
     let config = {};
-    const filePath = path.normalize(configName);
+    const filePath = path.normalize(untildify(configName));
     console.log(`config path: ${filePath}`);
     if (fs.existsSync(filePath)) {
+        console.log(`config path exist`);
         config = require(filePath);
     }
     return config;
@@ -315,6 +340,56 @@ async function callContract(cmdObj) {
     });
 }
 
+async function transferEth(cmdObj) {
+    let {from: fromAddress, pk: fromAddressPK, to: toAddress, money, config: configName} = cmdObj;
+    const config = readConfig(configName);
+    if (!fromAddress) {
+        fromAddress = config.fromAddress;
+    }
+    if (!toAddress) {
+        toAddress = config.toAddress;
+    }
+    if (!money) {
+        money = config.money;
+    }
+    if (!fromAddressPK) {
+        fromAddressPK = config.fromAddressPK;
+    }
+
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+
+    console.log("\n--------------Transfer ETH--------------\n");
+    console.log(`transfer command called - fromAddress: ${fromAddress}, toAddress: ${toAddress}, money: ${money}`);
+
+    await transferEthUtil.transferEth({web3, fromAddress, fromAddressPK, toAddress, money});
+}
+
+async function transferEthWithPassword(cmdObj) {
+    let {from: fromAddress, to: toAddress, money, password, config: configName} = cmdObj;
+    const config = readConfig(configName);
+
+    if (!fromAddress) {
+        fromAddress = config.fromAddress;
+    }
+    if (!toAddress) {
+        toAddress = config.toAddress;
+    }
+    if (!password) {
+        password = config.password;
+    }
+    if (!money) {
+        money = config.money;
+    }
+
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+
+    console.log("\n--------------Transfer ETH By Personal Account--------------\n");
+    console.log(`transfer command called - fromAddress: ${fromAddress}, toAddress: ${toAddress}, money: ${money}, config.url: ${config.url}`);
+
+    await transferEthUtil.transferEthByPersonalAccount({web3, fromAddress, toAddress, money, password});
+}
 
 async function transfer(cmdObj) {
     let {contract: contractAddress, from: fromAddress, pk: fromAddressPK, to: toAddress, abi, money, password, config: configName} = cmdObj;
