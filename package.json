@@ -1,6 +1,6 @@
 {
   "name": "tw-eth-cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "a simple cli tool for eth,quorum ",
   "main": "./src/index.js",
   "bin": {
