@@ -29,13 +29,15 @@
 
 ### 3. 查看命令基本信息
  
- `tw-eth-cli`
+`tw-eth-cli`
  
  > 大部分命令的参数可以配置在 config 文件中，也可以指定在命令行中，命令行的优先级大于 config。
  
  ### 4. 帮助文档
  
- `tw-eth-cli help <commmand>`
+`tw-eth-cli help <commmand>`
+ 
+`tw-eth-cli <commmand> -h `
  
 ### 5. 转账ERC20
 
@@ -81,7 +83,7 @@
 
 ### 11. balanceOf, 获取 eth 或者 erc20 余额
 
-`tw-eth-cli balanceOf` 
+`tw-eth-cli balanceOf -f <address>` 
 
 ### 12. inspect, 生成公钥和地址
 

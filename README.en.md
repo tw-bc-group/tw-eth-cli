@@ -29,11 +29,13 @@ default config path is `~/tw-eth-cli-config.js`
  
  ### 3. Details, all commands
  
- `tw-eth-cli`
+`tw-eth-cli`
  
  ### 4. Help
  
- `tw-eth-cli help <commmand>`
+`tw-eth-cli help <commmand>`
+ 
+`tw-eth-cli <commmand> -h `
  
 ### 5. Transfer ERC20
 
