@@ -1,53 +1,102 @@
 ## How to use
 
-English / [中文](./README.md)
+[English](./README.en.md) / 中文
 
-1. 需要在config文件里面配置私钥
+- This command wrapper web3.js and introduce simple cli commands to query balance and call contract with ETH, quorum, etc...
+- Put long parameters in the config file, such as abi, private key, etc...
+- The parameters fill in the console have a higher priority. 
 
-默认读取的config路径为`~/tw-eth-cli-config.js`
-tw-eth-cli transfer -t 0xcA843569e3427144cEad5e4d5999a3D0cCF92B8e -m 9.9 --config config.local.quorum.js 
+### 1. Install tw-eth-cli
 
-2. 只能在node节点有的账号转账，可以设置password
-tw-eth-cli transferWithPassword -t 0xcA843569e3427144cEad5e4d5999a3D0cCF92B8e -m 9.9 --config config.local.quorum.js 
-
-3. 查看命令基本信息
-tw-eth-cli
-
-4. 帮助文档
-tw-eth-cli help transfer 
-
-5. 全局安转
 npm install tw-eth-cli -g
 
-6. decode raw transaction
-tw-eth-cli decode --config config.js
-在config.js里面配置raw，如果想要解析data里面的数据，可以配置对应abi。
+### 2. config
 
-7. get transaction by hash
-tw-eth-cli getTx --config config.js
-在config.js里面配置hash，如果想要解析data里面的数据，可以配置对应abi。
+default config path is `~/tw-eth-cli-config.js`
 
-8. get block transactions
-tw-eth-cli getBlockTxs --config config.js 
-默认同步100个块
+| config | comment |
+| --- | --- |
+| url | url of web3.js |
+| fromAddress | from Address, used in transfer |
+| toAddress | to Address, used in transfer |
+| fromAddressPK | from Address private key, sign a transaction |
+| contractAddress |contract address, used in callContract |
+| raw | decode raw transaction |
+| hash | transaction hash, used in getTx | 
+| password | transfer by personal account | 
+| money | how many tokens to transfer  |
+| abi | abi of contract |
+ 
+ ### 3. Details, all commands
+ 
+ tw-eth-cli
+ 
+ ### 4. Help
+ 
+ tw-eth-cli help <commmand> 
+ 
+### 5. Transfer ERC20
 
-9. txpool, 查看节点缓存情况
- tw-eth-cli pool -c status --config config.js 
- tw-eth-cli pool -c content --config config.js 
- tw-eth-cli pool -c inspect --config config.js 
+tw-eth-cli transferWithPassword -t <address> -m 9.9 
 
-可以用 -u 配置远程节点，不适用config里面的url。
+>transferWithPassword use accounts in the web3.eth.personal 
 
-10. recoverTx，从raw transaction拿到地址，比较发送地址，验证签名
-tw-eth-cli recoverTx --config config.js
+tw-eth-cli transfer -t <address> -m 9.9 
 
-11. balanceOf, 获取eth或者erc20余额
-tw-eth-cli balanceOf --config config.js
+> this command design for ERC20, if you want to transfer ETH, please use transferEth
 
-12. inspect, 派生公钥和地址
+### 6. decode raw transaction
+
+tw-eth-cli decode --config <config.js>
+
+input raw, abi in config file. If you have abi, the data in raw can be decoded. 
+
+### 7. Get transaction by hash.
+
+tw-eth-cli getTx --config <config.js>
+
+You can config hash. abi in config file. If you have abi, the data in logs can be decoded. 
+
+### 8. Get block transactions.
+
+tw-eth-cli getBlockTxs
+
+default size is 100.
+
+### 9. txpool, check pool status
+
+tw-eth-cli pool -c status 
+ 
+tw-eth-cli pool -c content 
+ 
+tw-eth-cli pool -c inspect 
+
+-u <remote url>，replace url in config.
+
+### 10. Verify signature.
+
+tw-eth-cli recoverTx 
+
+### 11. Balance Of ETH and ERC20.
+
+tw-eth-cli balanceOf 
+
+### 12. Generate public key and address from private key.
+
 tw-eth-cli inspect -k <privateKey> 
 
-13. 读取keystore
- tw-eth-cli keystore -f /Users/yin/projects/twallet/tw-wallet-contract/jsLibTest/key.json
-0xca843569e3427144cead5e4d5999a3d0ccf92b8e
+### 13. Read Keystore.
+
+tw-eth-cli keystore -f <key.json>
+ 
+### 14. Transfer ETH.
+ 
+tw-eth-cli transferEth -t <address> -m 88 
+
+tw-eth-cli transferEthWithPassword -f <address> -t <address> -m 8.8
+
+### 15. Call Contract.
+
+tw-eth-cli callContract -m <method name> -p <parameter1>,<parameter2> --config <config file path>
+
 
