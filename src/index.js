@@ -45,6 +45,15 @@ program
     .description('call contract')
     .action(callContract);
 
+program
+    .command('callContractReturnValue')
+    .option('-f, --from <address>', 'from address')
+    .option('-m, --method <method>', 'contract method name')
+    .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
+    .option('--config <config>', 'config file path')
+    .description('call contract to get return value')
+    .action(callContractReturnValue);
+
 function commaSeparatedList(value, dummyPrevious) {
     return value.split(',');
 }
@@ -328,6 +337,42 @@ async function callContract(cmdObj) {
     console.log("\n--------------callContract--------------\n");
 
     await callContractUtil.callContract({
+        web3,
+        contractAddress,
+        method,
+        fromAddress,
+        fromAddressPK,
+        abi,
+        parameters,
+        gasPrice: config.gasPrice,
+        gasLimit: config.gasLimit
+    });
+}
+async function callContractReturnValue(cmdObj) {
+    let {method, parameters, config: configName, from: fromAddress, fromAddressPK, contractAddress, abi} = cmdObj;
+    const config = readConfig(configName);
+    if (!contractAddress) {
+        contractAddress = config.contractAddress;
+    }
+    if (!fromAddressPK) {
+        fromAddressPK = config.fromAddressPK;
+    }
+    if (!fromAddress) {
+        fromAddress = config.fromAddress;
+    }
+    if (!method) {
+        method = config.method;
+    }
+    if (!abi) {
+        abi = config.abi;
+    }
+
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+
+    console.log("\n--------------callContract--------------\n");
+
+    await callContractUtil.callContractReturnValue({
         web3,
         contractAddress,
         method,

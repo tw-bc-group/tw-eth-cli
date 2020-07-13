@@ -103,4 +103,4 @@ default size is 100.
 
 `tw-eth-cli callContract -m <method name> -p <parameter1>,<parameter2> --config <config file path>`
 
-
+`tw-eth-cli callContractReturnValue -m <method name> -p <parameter1>,<parameter2> --config <config file path>`

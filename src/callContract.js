@@ -23,4 +23,28 @@ exports.callContract = async function callContract({
     }, fromAddressPK);
     const receipt = await web3.eth.sendSignedTransaction(tx.rawTransaction);
     console.log(`receipt: ${JSON.stringify(receipt, null, 4)}`);
+
+};
+
+//https://web3js.readthedocs.io/en/v1.2.9/web3-eth-contract.html?highlight=call#methods-mymethod-call
+exports.callContractReturnValue = async function ({
+                                                      web3,
+                                                      contractAddress,
+                                                      method,
+                                                      fromAddress,
+                                                      fromAddressPK,
+                                                      abi,
+                                                      parameters = [],
+                                                      gasPrice = 0,
+                                                      gasLimit = 210000
+                                                  }) {
+
+    // myContract.methods.myMethod(123).call({from: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe'})
+
+    console.log(`callContract - method: ${method}, parameters: ${parameters}, contractAddress:${contractAddress}`);
+    const contract = new web3.eth.Contract(abi, contractAddress);
+    const data = await contract.methods[method](...parameters).call({
+        from: fromAddress, gasPrice, gas: gasLimit
+    });
+    console.log(`data: ${JSON.stringify(data, null, 4)}`);
 };
