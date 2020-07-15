@@ -9,7 +9,6 @@ const callContractUtil = require('./callContract');
 const decodeUtil = require('./decodeTxRaw');
 const txUtil = require('./getTransaction');
 const inspect = require('./inspects');
-const keystoreRead = require('./importKeystore');
 const version = require('../package.json').version
 
 program.version(`eth cli ${version}`);
@@ -47,10 +46,10 @@ program
 
 program
     .command('callContractReturnValue')
-    .option('-f, --from <address>', 'from address')
-    .option('-m, --method <method>', 'contract method name')
+    .option('-f, --from <string>', 'from address')
+    .option('-m, --method <string>', 'contract method name')
     .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
-    .option('--config <config>', 'config file path')
+    .option('--config <string>', 'config file path')
     .description('call contract to get return value')
     .action(callContractReturnValue);
 
@@ -60,87 +59,88 @@ function commaSeparatedList(value, dummyPrevious) {
 
 program
     .command('transferWithPassword')
-    .option('-c, --contract <type>', 'contract address')
-    .option('-f, --from <type>', 'from address')
-    .option('-t, --to <type>', 'to address')
-    .option('-a, --abi <type>', 'abi')
-    .option('-m, --money <type>', 'money')
-    .option('-p, --password <type>', 'password')
-    .option('--config <type>', 'config')
+    .option('-c, --contract <string>', 'contract address')
+    .option('-f, --from <string>', 'from address')
+    .option('-t, --to <string>', 'to address')
+    .option('-a, --abi <string>', 'abi')
+    .option('-m, --money <number>', 'money')
+    .option('-p, --password <password>', 'password')
+    .option('--config <string>', 'config')
     .description('transfer token by personal account')
     .action(transferWithPassword);
 
 
 program
     .command('transferEthWithPassword')
-    .option('-f, --from <type>', 'from address')
-    .option('-t, --to <type>', 'to address')
-    .option('-m, --money <type>', 'money')
-    .option('-p, --password <type>', 'password')
-    .option('--config <type>', 'config')
+    .option('-f, --from <string>', 'from address')
+    .option('-t, --to <string>', 'to address')
+    .option('-m, --money <number>', 'money')
+    .option('-p, --password <password>', 'password')
+    .option('--config <string>', 'config')
     .description('transfer eth by personal account')
     .action(transferEthWithPassword);
 
 
 program
     .command('decode')
-    .option('-r, --raw <type>', 'raw transaction')
-    .option('-a, --abi <type>', 'abi')
-    .option('--config <type>', 'config')
+    .option('-r, --raw <string>', 'raw transaction')
+    .option('-a, --abi <string>', 'abi')
+    .option('--config <string>', 'config')
     .description('decode raw transaction')
     .action(decode);
 
 program
     .command('getTx')
-    .option('-h, --hash <type>', 'transaction hash')
-    .option('-a, --abi <type>', 'abi')
-    .option('--config <type>', 'config')
+    .option('-h, --hash <string>', 'transaction hash')
+    .option('-a, --abi <string>', 'abi')
+    .option('--config <string>', 'config')
     .description('get transaction, decode data with abi')
     .action(getTx);
 
 program
     .command('getBlockTxs')
-    .option('-s, --start <type>', 'start block number')
-    .option('-e, --end <type>', 'end block number')
-    .option('-f, --filter-address <type>', 'filter address')
-    .option('-a, --abi <type>', 'abi')
-    .option('--config <type>', 'config')
+    .option('-s, --start <string>', 'start block number')
+    .option('-e, --end <string>', 'end block number')
+    .option('-f, --filter-address <string>', 'filter address')
+    .option('-a, --abi <string>', 'abi')
+    .option('--config <string>', 'config')
     .description('get block transactions, decode data with abi')
     .action(getBlockTxs);
 
 program
     .command('pool')
-    .option('-c, --cmd <type>', 'content | inspect | status')
-    .option('-u, --url <type>', 'url use by web3')
-    .option('--config <type>', 'config url')
+    .option('-c, --cmd <string>', 'content | inspect | status')
+    .option('-u, --url <string>', 'url use by web3')
+    .option('--config <string>', 'config url')
     .description('get transaction pool')
     .action(txPool);
 
 program
     .command('recoverTx')
-    .option('-r, --raw <type>', 'raw transaction')
-    .option('--config <type>', 'config url')
+    .option('-r, --raw <string>', 'raw transaction')
+    .option('--config <string>', 'config url')
     .description('recover transaction, return address')
     .action(recoverTx);
 
 program
     .command('balanceOf')
-    .option('-f, --from-address <type>', 'from address')
-    .option('-c, --contract-address <type>', 'contract address')
-    .option('-a, --abi <type>', 'abi')
-    .option('--config <type>', 'config url')
+    .option('-f, --from-address <string>', 'from address')
+    .option('-c, --contract-address <string>', 'contract address')
+    .option('-a, --abi <string>', 'abi')
+    .option('--config <string>', 'config url')
     .description('balance of address')
     .action(balanceOf);
 
 program
     .command('inspect')
-    .option('-k, --privateKey <key>', 'private key')
+    .option('-k, --privateKey <string>', 'private key')
     .description('derive private key to public key with address')
     .action(privateKeyToPublicKey);
 
 program
     .command('keystore')
-    .option('-f, --file <file>', 'file')
+    .option('-f, --file <string>', 'file')
+    .option('-p, --password <password>', 'password', "")
     .description('read keystore')
     .action(importKeyStore);
 
@@ -158,12 +158,19 @@ function readConfig(configName = "~/tw-eth-cli-config.js") {
 }
 
 async function importKeyStore(cmdObj) {
-    let {file, config: configName} = cmdObj;
+    let {file, config: configName, password} = cmdObj;
     const config = readConfig(configName);
-    const filePath = path.normalize(file);
+    let filePath = path.normalize(untildify(file));
+    if (!path.isAbsolute(file)) {
+        filePath = path.normalize(untildify(path.join(process.cwd(), file)));
+    }
+    console.log(`importKeyStore path: ${filePath}`);
     const Web3 = require("web3");
     const web3 = new Web3(config.url);
-    keystoreRead(web3, filePath);
+    const raw = fs.readFileSync(filePath);
+    let keystoreJsonV3 = JSON.parse(raw);
+    let decryptedAccount = web3.eth.accounts.decrypt(keystoreJsonV3, password);
+    console.log(`decryptedAccount: ${JSON.stringify(decryptedAccount)}`);
 }
 
 async function balanceOf(cmdObj) {
@@ -348,6 +355,7 @@ async function callContract(cmdObj) {
         gasLimit: config.gasLimit
     });
 }
+
 async function callContractReturnValue(cmdObj) {
     let {method, parameters, config: configName, from: fromAddress, fromAddressPK, contractAddress, abi} = cmdObj;
     const config = readConfig(configName);
