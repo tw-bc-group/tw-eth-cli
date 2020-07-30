@@ -170,7 +170,9 @@ async function importKeyStore(cmdObj) {
     const raw = fs.readFileSync(filePath);
     let keystoreJsonV3 = JSON.parse(raw);
     let decryptedAccount = web3.eth.accounts.decrypt(keystoreJsonV3, password);
-    console.log(`decryptedAccount: ${JSON.stringify(decryptedAccount)}`);
+    const ethers = require('ethers');
+    const wallet = new ethers.Wallet(decryptedAccount.privateKey);
+    console.log(`wallet：${JSON.stringify(wallet)}`);
 }
 
 async function balanceOf(cmdObj) {
