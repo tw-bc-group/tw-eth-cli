@@ -42,9 +42,11 @@ exports.transferByPersonalAccount = async function transfer(web3, contractAddres
 exports.transfer = async function transfer(web3, contractAddress, fromAddress, fromAddressPK, toAddress, abi, money = "1.1", gasPrice = 0, gasLimit = 210000) {
     const erc20Contract = new web3.eth.Contract(abi, contractAddress);
 
+    const BN = require("bn.js");
+
     await balance(erc20Contract, fromAddress);
     const adjustMoney = await CalcMoney(erc20Contract, money);
-    const data = erc20Contract.methods.transfer(toAddress, adjustMoney).encodeABI();
+    const data = erc20Contract.methods.transfer(toAddress,  new BN(adjustMoney)).encodeABI();
     const nonce = await web3.eth.getTransactionCount(fromAddress);
     const tx = await web3.eth.accounts.signTransaction({
         nonce: web3.utils.toHex(nonce),
@@ -54,8 +56,6 @@ exports.transfer = async function transfer(web3, contractAddress, fromAddress, f
         gasLimit: web3.utils.toHex(gasLimit),
         data: data
     }, fromAddressPK);
-    const recoverTransaction = web3.eth.accounts.recover(tx.messageHash, tx.v, tx.r, tx.s, true);
-    console.log(`recoverTransaction: ${recoverTransaction}`);
 
     const receipt = await web3.eth.sendSignedTransaction(tx.rawTransaction);
     console.log(`receipt: ${JSON.stringify(receipt, null, 4)}`);
@@ -73,7 +73,8 @@ exports.balanceOf = async function balanceOf(web3, address, contractAddress, abi
 
 async function CalcMoney(erc20Contract, value) {
     const decimal = await erc20Contract.methods.decimals().call();
-    const adjustedValue = value * Math.pow(10, decimal);
+    let adjustedValue = value * Math.pow(10, decimal);
+    adjustedValue = adjustedValue.toFixed(decimal);
     console.log(`Transfer: decimal:${decimal}, value:${value}, adjustedValue:${adjustedValue}`);
     return adjustedValue;
 }
