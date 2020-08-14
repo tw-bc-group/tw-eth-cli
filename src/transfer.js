@@ -42,11 +42,9 @@ exports.transferByPersonalAccount = async function transfer(web3, contractAddres
 exports.transfer = async function transfer(web3, contractAddress, fromAddress, fromAddressPK, toAddress, abi, money = "1.1", gasPrice = 0, gasLimit = 210000) {
     const erc20Contract = new web3.eth.Contract(abi, contractAddress);
 
-    const BN = require("bn.js");
-
     await balance(erc20Contract, fromAddress);
     const adjustMoney = await CalcMoney(erc20Contract, money);
-    const data = erc20Contract.methods.transfer(toAddress,  new BN(adjustMoney)).encodeABI();
+    const data = erc20Contract.methods.transfer(toAddress, adjustMoney).encodeABI();
     const nonce = await web3.eth.getTransactionCount(fromAddress);
     const tx = await web3.eth.accounts.signTransaction({
         nonce: web3.utils.toHex(nonce),
@@ -71,11 +69,15 @@ exports.balanceOf = async function balanceOf(web3, address, contractAddress, abi
     }
 }
 
+/**
+ * @return {string}
+ */
 async function CalcMoney(erc20Contract, value) {
     const decimal = await erc20Contract.methods.decimals().call();
     let adjustedValue = value * Math.pow(10, decimal);
-    adjustedValue = adjustedValue.toFixed(decimal);
-    console.log(`Transfer: decimal:${decimal}, value:${value}, adjustedValue:${adjustedValue}`);
+    // issue：不支持传入小数点
+    adjustedValue = adjustedValue.toFixed(0);
+    console.log(`CalcMoney: decimal:${decimal}, value:${value}, adjustedValue:${adjustedValue}`);
     return adjustedValue;
 }
 
@@ -86,5 +88,5 @@ async function balance(erc20Contract, fromAddress) {
 
     const balance = await erc20Contract.methods.balanceOf(fromAddress).call();
     const adjustedBalance = balance / Math.pow(10, decimal);
-    console.log(`Transfer: name:${name}, symbol:${symbol}, balance:${adjustedBalance}`);
+    console.log(`balance: name:${name}, symbol:${symbol}, balance:${adjustedBalance}`);
 }

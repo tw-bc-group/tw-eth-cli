@@ -1,6 +1,6 @@
 {
   "name": "tw-eth-cli",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "a simple cli tool for eth,quorum ",
   "main": "./src/index.js",
   "bin": {
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/tw-bc-group/eth-cli#readme",
   "dependencies": {
     "abi-decoder": "^2.3.0",
+    "bn": "^1.0.5",
     "commander": "^5.1.0",
     "ethers": "^4.0.46",
     "untildify": "^4.0.0",
