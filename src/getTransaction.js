@@ -1,4 +1,8 @@
 async function getTxHash(web3, hash, abi) {
+    const tx =  await web3.eth.getTransaction(hash);
+    console.log(`tx : ${JSON.stringify(tx, null, 4)}`);
+    const input = web3.utils.toAscii(tx.input);
+    console.log(`input : ${JSON.stringify(input, null, 4)}`);
     const receipt = await web3.eth.getTransactionReceipt(hash);
     console.log(`receipt : ${JSON.stringify(receipt, null, 4)}`);
     if (receipt && receipt.logs) {

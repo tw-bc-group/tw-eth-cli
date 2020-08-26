@@ -22,12 +22,13 @@ exports.transferEthByPersonalAccount = async function (
         value: web3.utils.toWei(money, "ether"),
         gasPrice: web3.utils.toHex(gasPrice),
         gasLimit: web3.utils.toHex(gasLimit),
-        nonce
+        nonce,
+        data:web3.utils.toHex('My father is yin')
     });
     const afterBalanceFrom = await web3.eth.getBalance(fromAddress);
     const afterBalanceTo = await web3.eth.getBalance(toAddress);
     console.log(`afterBalanceFrom:${web3.utils.fromWei(afterBalanceFrom)}, afterBalanceTo:${web3.utils.fromWei(afterBalanceTo)}`);
-    console.log(`Receipt: ${JSON.stringify(receipt.blockHash, null, 4)}`);
+    console.log(`Receipt: ${JSON.stringify(receipt, null, 4)}`);
 };
 
 exports.transferEth = async function (
@@ -47,6 +48,7 @@ exports.transferEth = async function (
         value: web3.utils.toWei(money, "ether"),
         gasPrice: web3.utils.toHex(gasPrice),
         gasLimit: web3.utils.toHex(gasLimit),
+        data:web3.utils.toHex('My father is yin')
     }, fromAddressPK);
     const beforeBalance = await web3.eth.getBalance(fromAddress);
     console.log(`beforeBalance: ${web3.utils.fromWei(beforeBalance)}`);
@@ -54,5 +56,5 @@ exports.transferEth = async function (
     const afterBalanceFrom = await web3.eth.getBalance(fromAddress);
     const afterBalanceTo = await web3.eth.getBalance(toAddress);
     console.log(`afterBalanceFrom:${web3.utils.fromWei(afterBalanceFrom)}, afterBalanceTo:${web3.utils.fromWei(afterBalanceTo)}`);
-    console.log(`Receipt: ${JSON.stringify(receipt.blockHash, null, 4)}`);
+    console.log(`Receipt: ${JSON.stringify(receipt, null, 4)}`);
 };
