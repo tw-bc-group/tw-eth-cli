@@ -6,6 +6,7 @@ const program = require('commander');
 const transferUtil = require('./transfer');
 const transferEthUtil = require('./transferEth');
 const callContractUtil = require('./callContract');
+const callWeb3Utils = require('./callWeb3Utils');
 const decodeUtil = require('./decodeTxRaw');
 const txUtil = require('./getTransaction');
 const inspect = require('./inspects');
@@ -143,6 +144,13 @@ program
     .option('-p, --password <password>', 'password', "")
     .description('read keystore')
     .action(importKeyStore);
+
+program
+    .command('utils')
+    .option('-m, --method <method>', 'web3 utils method name')
+    .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
+    .description('call web3 utils')
+    .action(callWeb3);
 
 program.parse(process.argv);
 
@@ -316,10 +324,17 @@ function decode(cmdObj) {
     decodeUtil(raw, abi);
 }
 
-//
-// .option('-m, --method <type>', 'contract method name')
-//     .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
-//     .option('--config <type>', 'config')
+async function callWeb3(cmdObj) {
+    let {method, parameters} = cmdObj;
+    console.log("\n--------------callWeb3--------------\n");
+    const Web3 = require("web3");
+    const web3 = new Web3();
+    await callWeb3Utils.callWeb3Utils({
+        web3,
+        method,
+        parameters
+    });
+}
 
 async function callContract(cmdObj) {
     let {method, parameters, config: configName, from: fromAddress, fromAddressPK, contractAddress, abi} = cmdObj;
