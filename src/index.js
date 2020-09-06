@@ -10,7 +10,9 @@ const callWeb3Utils = require('./callWeb3Utils');
 const decodeUtil = require('./decodeTxRaw');
 const txUtil = require('./getTransaction');
 const inspect = require('./inspects');
-const version = require('../package.json').version
+const signUtil = require('./signData');
+
+const version = require('../package.json').version;
 
 program.version(`eth cli ${version}`);
 
@@ -152,6 +154,21 @@ program
     .description('call web3 utils')
     .action(callWeb3);
 
+program
+    .command('sign')
+    .option('-m, --message <message>', 'message')
+    .option('-k, --privateKey <private-key>', 'private-key')
+    .option('--config <string>', 'config url')
+    .description('call web3 sign')
+    .action(callWeb3Sign);
+
+program
+    .command('recover')
+    .option('-m, --message <message>', 'message')
+    .option('-s, --signature <signature>', 'signature')
+    .description('call web3 recover')
+    .action(callWeb3Recover);
+
 program.parse(process.argv);
 
 function readConfig(configName = "~/tw-eth-cli-config.js") {
@@ -163,6 +180,38 @@ function readConfig(configName = "~/tw-eth-cli-config.js") {
         config = require(filePath);
     }
     return config;
+}
+
+async function callWeb3Recover(cmdObj) {
+    let {message, signature, config: configName} = cmdObj;
+    const config = readConfig(configName);
+
+    if (!message) {
+        message = config.message;
+    }
+
+    console.log("\n--------------callWeb3Recover--------------\n");
+    console.log(`callWeb3Recover command called - signature: ${signature}, message: ${message}\n`);
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+    await signUtil.sign({web3, signature, message});
+}
+
+async function callWeb3Sign(cmdObj) {
+    let {message, privateKey, config: configName} = cmdObj;
+    const config = readConfig(configName);
+    if (!privateKey) {
+        privateKey = config.privateKey;
+    }
+    if (!message) {
+        message = config.message;
+    }
+
+    console.log("\n--------------callWeb3Sign--------------\n");
+    console.log(`callWeb3Sign command called - privateKey: ${privateKey}, message: ${message}\n`);
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+    await signUtil.sign({web3, privateKey, message});
 }
 
 async function importKeyStore(cmdObj) {
