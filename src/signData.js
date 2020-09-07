@@ -5,7 +5,7 @@ exports.sign = async function sign({web3, privateKey, message = "hello world"}) 
     console.log(`signature : ${JSON.stringify(signature, null, 4)}`);
 };
 
-exports.sign = async function recover({web3, signature, message = "hello world"}) {
+exports.recover = async function recover({web3, signature, message = "hello world"}) {
     const address = web3.eth.accounts.recover(message, signature);
     console.log(`address : ${address}`);
 };

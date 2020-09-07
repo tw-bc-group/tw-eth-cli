@@ -194,7 +194,7 @@ async function callWeb3Recover(cmdObj) {
     console.log(`callWeb3Recover command called - signature: ${signature}, message: ${message}\n`);
     const Web3 = require("web3");
     const web3 = new Web3(config.url);
-    await signUtil.sign({web3, signature, message});
+    await signUtil.recover({web3, signature, message});
 }
 
 async function callWeb3Sign(cmdObj) {
