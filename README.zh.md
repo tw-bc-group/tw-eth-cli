@@ -105,4 +105,17 @@
 
 `tw-eth-cli callContractReturnValue -m <method name> -p <parameter1>,<parameter2> --config <config file path>`
 
+### 16. Sign and verify
+
+```js
+// sign
+tw-eth-cli sign -m <message> -k <privateKey>
+
+// verify
+tw-eth-cli recover -m <message> -s <signature>
+
+// get address and compare
+tw-eth-cli inspect -k <privateKey>
+```
+
 
