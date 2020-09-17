@@ -118,3 +118,11 @@ tw-eth-cli recover -m <message> -s <signature>
 // get address and compare
 tw-eth-cli inspect -k <privateKey>
 ```
+
+### 17 Sign and return transaction
+
+```bash
+tw-eth-cli signRawTx -m <method> -p <parameters>
+```
+
+after get raw tx, you can use decode cmd to parse it.

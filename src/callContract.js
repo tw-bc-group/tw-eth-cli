@@ -9,7 +9,34 @@ exports.callContract = async function callContract({
                                                        gasPrice = 0,
                                                        gasLimit = 210000
                                                    }) {
-    console.log(`callContract - method: ${method}, parameters: ${parameters}, contractAddress:${contractAddress}`);
+    const tx = await signRawTx({
+        web3,
+        contractAddress,
+        method,
+        fromAddress,
+        fromAddressPK,
+        abi,
+        parameters,
+        gasPrice,
+        gasLimit
+    });
+    const receipt = await web3.eth.sendSignedTransaction(tx.rawTransaction);
+    console.log(`receipt: ${JSON.stringify(receipt, null, 4)}`);
+};
+
+async function signRawTx({
+                             web3,
+                             contractAddress,
+                             method,
+                             fromAddress,
+                             fromAddressPK,
+                             abi,
+                             parameters = [],
+                             gasPrice = 0,
+                             gasLimit = 210000
+                         }) {
+
+    console.log(`signRawTx - method: ${method}, parameters: ${parameters}, contractAddress:${contractAddress}`);
     const contract = new web3.eth.Contract(abi, contractAddress);
     const data = contract.methods[method](...parameters).encodeABI();
     const nonce = await web3.eth.getTransactionCount(fromAddress);
@@ -21,10 +48,13 @@ exports.callContract = async function callContract({
         gasLimit: web3.utils.toHex(gasLimit),
         data: data
     }, fromAddressPK);
-    const receipt = await web3.eth.sendSignedTransaction(tx.rawTransaction);
-    console.log(`receipt: ${JSON.stringify(receipt, null, 4)}`);
 
-};
+
+    console.log(`tx: ${JSON.stringify(tx, null, 4)}`);
+    return tx;
+}
+
+exports.signRawTx = signRawTx;
 
 //https://web3js.readthedocs.io/en/v1.2.9/web3-eth-contract.html?highlight=call#methods-mymethod-call
 exports.callContractReturnValue = async function ({

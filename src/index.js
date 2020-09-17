@@ -48,6 +48,15 @@ program
     .action(callContract);
 
 program
+    .command('signRawTx')
+    .option('-f, --from <address>', 'from address')
+    .option('-m, --method <method>', 'contract method name')
+    .option('-p, --parameters <parameters>', 'comma separated parameters', commaSeparatedList)
+    .option('--config <config>', 'config file path')
+    .description('sign and return tx')
+    .action(signRawTx);
+
+program
     .command('callContractReturnValue')
     .option('-f, --from <string>', 'from address')
     .option('-m, --method <string>', 'contract method name')
@@ -382,6 +391,43 @@ async function callWeb3(cmdObj) {
         web3,
         method,
         parameters
+    });
+}
+
+async function signRawTx(cmdObj) {
+    let {method, parameters, config: configName, from: fromAddress, fromAddressPK, contractAddress, abi} = cmdObj;
+    const config = readConfig(configName);
+    if (!contractAddress) {
+        contractAddress = config.contractAddress;
+    }
+    if (!fromAddressPK) {
+        fromAddressPK = config.fromAddressPK;
+    }
+    if (!fromAddress) {
+        fromAddress = config.fromAddress;
+    }
+    if (!method) {
+        method = config.method;
+    }
+    if (!abi) {
+        abi = config.abi;
+    }
+
+    const Web3 = require("web3");
+    const web3 = new Web3(config.url);
+
+    console.log("\n--------------signRawTx--------------\n");
+
+    await callContractUtil.signRawTx({
+        web3,
+        contractAddress,
+        method,
+        fromAddress,
+        fromAddressPK,
+        abi,
+        parameters,
+        gasPrice: config.gasPrice,
+        gasLimit: config.gasLimit
     });
 }
 
